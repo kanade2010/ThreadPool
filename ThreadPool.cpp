@@ -65,7 +65,7 @@ void ThreadPool::addTask(const Task& task)
   std::unique_lock<std::mutex> lock(m_mutex);
   /*while(m_tasks.isFull())
     {//when m_tasks have maxsize
-      cond2.notify();
+      cond2.wait();
     }
   */
   TaskPair taskPair(level2, task);
@@ -78,7 +78,7 @@ void ThreadPool::addTask(const TaskPair& taskPair)
   std::unique_lock<std::mutex> lock(m_mutex);
   /*while(m_tasks.isFull())
     {//when m_tasks have maxsize
-      cond2.notify();
+      cond2.wait();
     }
   */
   m_tasks.push(taskPair);
