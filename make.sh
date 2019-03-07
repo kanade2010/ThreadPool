@@ -1,1 +1,1 @@
-g++  CurrentThread.cpp main.cpp ThreadPool.cpp -o test.out -lpthread
+g++ -D__SOLA_LOGGING_ENABLED example.cpp thread_pool.cpp -o test.out -lpthread
