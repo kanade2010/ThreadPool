@@ -108,8 +108,11 @@ int main()
 
   sola::thread_pool thread_pool;
 
+
+  std::shared_ptr<sola::thread_pool::task_t> taskPtr = std::make_shared<sola::thread_pool::task_t>(std::bind(testFunc));
+
   for(int i = 0; i < 5 ; i++)
-    thread_pool.add_task(testFunc);
+    thread_pool.add_task(taskPtr);
 
   getchar();
   return 0;
