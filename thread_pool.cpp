@@ -132,16 +132,20 @@ void thread_pool::thread_loop()
   __SOLA_LOG(debug, "thread_pool::threadLoop() tid : " + get_tid() + " start.");
   while(m_is_started)
   {
-    task_t task = take();
+    auto task = take().lock();
     if(task)
     {
-      task();
+      (*task)();
+    }
+    else
+    {
+      __SOLA_LOG(info, "thread_pool::threadLoop() tid : " + get_tid() + " task not exit.");
     }
   }
   __SOLA_LOG(debug, "thread_pool::threadLoop() tid : " + get_tid() + " exit.");
 }
 
-void thread_pool::add_task(const task_t& task)
+void thread_pool::add_task(std::weak_ptr<task_t> task)
 {
   std::unique_lock<std::mutex> lock(m_mutex);
   /*while(m_tasks.isFull())
@@ -153,7 +157,7 @@ void thread_pool::add_task(const task_t& task)
   m_cond.notify_one();
 }
 
-thread_pool::task_t thread_pool::take()
+std::weak_ptr<thread_pool::task_t> thread_pool::take()
 {
   std::unique_lock<std::mutex> lock(m_mutex);
   //always use a while-loop, due to spurious wakeup
@@ -165,7 +169,7 @@ thread_pool::task_t thread_pool::take()
 
   __SOLA_LOG(debug, "thread_pool::take() tid : " + get_tid() + " wakeup.");
 
-  task_t task;
+  std::weak_ptr<thread_pool::task_t>  task;
   tasks_t::size_type size = m_tasks.size();
   if(!m_tasks.empty() && m_is_started)
   {

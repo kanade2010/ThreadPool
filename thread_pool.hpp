@@ -1,3 +1,4 @@
+
 #ifndef _thread_pool_HPP
 #define _thread_pool_HPP
 
@@ -195,24 +196,26 @@ class thread_pool{
 public:
   typedef std::function<void()> task_t;
 
-  thread_pool(int init_size = 3);
+  thread_pool(int init_size = 1);
   ~thread_pool();
 
   void stop();
-  void add_task(const task_t&);  //thread safe;
+
+  void add_task(std::weak_ptr<task_t> task);
 
 private:
-  thread_pool(const thread_pool&);//禁止复制拷贝.
+  thread_pool(const thread_pool&);//ç¦æ­¢å¤å¶æ·è´.
   const thread_pool& operator=(const thread_pool&);
   
   bool is_started() { return m_is_started; }
   void start();
 
   void thread_loop();
-  task_t take();
+  std::weak_ptr<thread_pool::task_t>  take();
 
   typedef std::vector<std::thread*> threads_t;
-  typedef std::deque<task_t> tasks_t;
+
+  typedef std::deque<std::weak_ptr<task_t>> tasks_t;
 
   int m_init_threads_size;
 
